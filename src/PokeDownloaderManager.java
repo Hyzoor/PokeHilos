@@ -11,7 +11,7 @@ public class PokeDownloaderManager {
     private int imageCounter = 1;
 
 
-    public PokeDownloaderManager(int MAX_PARALLEL_DOWNLOADS){
+    public PokeDownloaderManager(int MAX_PARALLEL_DOWNLOADS) {
         this.MAX_PARALLEL_DOWNLOADS = MAX_PARALLEL_DOWNLOADS;
         downloaders = new PokeImageDownloader[MAX_PARALLEL_DOWNLOADS];
         frame = new Window();
@@ -19,14 +19,16 @@ public class PokeDownloaderManager {
 
 
     public void getNImages(int n) throws InterruptedException {
-        int layout = (int) Math.sqrt(n) + 1;
+        int layout = (int) Math.sqrt(n);
+        if (layout * layout < n) layout++;
         frame.setLayout(new GridLayout(layout, layout));
-        while(n > 0){
+
+        while (n >= 4) {
 
             initializeThreads();
 
-            for(int i = 0; i < MAX_PARALLEL_DOWNLOADS;i ++){
-                downloaders[i].setSource(pokeUrl+n+".png");
+            for (int i = 0; i < MAX_PARALLEL_DOWNLOADS; i++) {
+                downloaders[i].setSource(pokeUrl + n + ".png");
                 n--;
             }
 
@@ -41,16 +43,28 @@ public class PokeDownloaderManager {
             downloaders[2].join();
             downloaders[3].join();
 
-            for(int i = 0; i < MAX_PARALLEL_DOWNLOADS; i++){
+            for (int i = 0; i < MAX_PARALLEL_DOWNLOADS; i++) {
                 frame.addImage(downloaders[i].getPokeSprite());
             }
 
         }
+
+        if (!(n > 0)) {
+            return;
+        }
+
+        initializeThreads();
+        for (int i = n; i > 0; i--) {
+            downloaders[i].setSource(pokeUrl+i+".png");
+            downloaders[i].start();
+            downloaders[i].join();
+            frame.addImage(downloaders[i].getPokeSprite());
+        }
     }
 
 
-    private void initializeThreads(){
-        for(int i = 0; i < MAX_PARALLEL_DOWNLOADS; i++){
+    private void initializeThreads() {
+        for (int i = 0; i < MAX_PARALLEL_DOWNLOADS; i++) {
             downloaders[i] = new PokeImageDownloader();
         }
     }

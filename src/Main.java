@@ -2,7 +2,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int NUMERO_POKEMONS_A_DESCARGAR = 200;
+        int NUMERO_POKEMONS_A_DESCARGAR = 10;
 
         PokeDownloaderManager pokeDownloader = new PokeDownloaderManager(4);
         try{
